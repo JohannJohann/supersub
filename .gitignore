@@ -1,0 +1,79 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Frontend dependencies
+supersub_frontend/node_modules
+supersub_frontend/.pnp
+supersub_frontend/.pnp.*
+supersub_frontend/.yarn/*
+!supersub_frontend/.yarn/patches
+!supersub_frontend/.yarn/plugins
+!supersub_frontend/.yarn/releases
+!supersub_frontend/.yarn/versions
+
+# Frontend testing
+supersub_frontend/coverage
+
+# Frontend next.js
+supersub_frontend/.next/
+supersub_frontend/out/
+
+# Frontend production
+supersub_frontend/build
+
+# Backend Python
+supersub_backend/__pycache__/
+supersub_backend/*.py[cod]
+supersub_backend/*$py.class
+supersub_backend/*.so
+supersub_backend/.Python
+supersub_backend/build/
+supersub_backend/develop-eggs/
+supersub_backend/dist/
+supersub_backend/downloads/
+supersub_backend/eggs/
+supersub_backend/.eggs/
+supersub_backend/lib/
+supersub_backend/lib64/
+supersub_backend/parts/
+supersub_backend/sdist/
+supersub_backend/var/
+supersub_backend/wheels/
+supersub_backend/share/python-wheels/
+supersub_backend/*.egg-info/
+supersub_backend/.installed.cfg
+supersub_backend/*.egg
+supersub_backend/MANIFEST
+
+# Backend virtual environment
+supersub_backend/.venv/
+supersub_backend/venv/
+supersub_backend/ENV/
+supersub_backend/env/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db

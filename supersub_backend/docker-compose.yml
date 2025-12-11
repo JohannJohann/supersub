@@ -1,0 +1,90 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: supersub_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-johann}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mypassword}
+      POSTGRES_DB: ${POSTGRES_DB:-supersub_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-johann} -d ${POSTGRES_DB:-supersub_db}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - supersub-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: supersub_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: redis-server --appendonly yes
+    networks:
+      - supersub-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: supersub_backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-johann}:${POSTGRES_PASSWORD:-mypassword}@postgres:5432/${POSTGRES_DB:-supersub_db}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/.venv
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - supersub-network
+
+  frontend:
+    build:
+      context: ../supersub_frontend
+      dockerfile: Dockerfile
+    container_name: supersub_frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:${BACKEND_PORT:-8000}
+    volumes:
+      - ../supersub_frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - supersub-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  supersub-network:
+    driver: bridge
